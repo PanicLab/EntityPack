@@ -9,6 +9,7 @@ public class Customer  implements Entity<Long> {
     private Long id;
     private int age;
     private String name;
+    private HaoticEnum haoticEnum;
 
 
     @Override
@@ -42,6 +43,14 @@ public class Customer  implements Entity<Long> {
         return Objects.hash(id, age, name);
     }
 
+    public HaoticEnum getHaoticEnum() {
+        return haoticEnum;
+    }
+
+    public void setHaoticEnum(HaoticEnum haoticEnum) {
+        this.haoticEnum = haoticEnum;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
@@ -54,6 +63,7 @@ public class Customer  implements Entity<Long> {
         if (!(Objects.equals(this.getId(), other.getId()))) return false;
         if (this.getAge() != other.getAge()) return false;
         if (!(Objects.equals(this.getName(), other.getName()))) return false;
+        if (!(Objects.equals(this.getHaoticEnum(), other.getHaoticEnum()))) return false;
 
         return true;
     }
