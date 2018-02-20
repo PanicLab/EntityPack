@@ -64,14 +64,14 @@ class EntitiesTest {
         }
         original.setArray(array);
 
-        //List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
-        List<String> list = new ArrayList<>();
+        List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
+/*        List<String> list = new ArrayList<>();
         list.add("Alpha");
         list.add("Beta");
-        list.add("Gamma");
+        list.add("Gamma");*/
         original.setList(list);
 
-        Set<Integer> set = new HashSet<>();
+        Set<Integer> set = new TreeSet<>();
         set.add(100);
         set.add(200);
         set.add(300);

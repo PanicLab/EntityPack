@@ -97,6 +97,7 @@ public final class Entities {
             Constructor<T> constructor;
             Object constructorArgument;
 
+            //TODO создать массив и вернуть как Arrays.asList
             if(obj.getClass().getCanonicalName().equals("java.util.Arrays.ArrayList")) {
                 constructor = (Constructor<T>)Arrays.stream(obj.getClass().getDeclaredConstructors())
                         .findAny()
