@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Test;
 import test.Customer;
 import test.HaoticEnum;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EntitiesTest {
@@ -20,6 +25,35 @@ class EntitiesTest {
     }
 
     @Test
+    void arraysTest() {
+
+        Long[] one = new Long[3];
+        Long[] two = new Long[3];
+
+        for (int x=0; x<3; x++ ) {
+            one[x] = (long)x;
+            two[x] = (long)x;
+        }
+
+        assertTrue(Arrays.equals(one,two));
+        assertTrue(Arrays.deepEquals(one, two));
+        assertFalse(one == two);
+
+        two[2] = 100L;
+
+        assertFalse(Arrays.equals(one,two));
+        assertFalse(Arrays.deepEquals(one,two));
+    }
+
+    @Test
+    void collectionTest() {
+        List<String> list = new ArrayList<>();
+
+        assertTrue(Collection.class.isAssignableFrom(list.getClass()));
+
+    }
+
+    @Test
     void getCopyOf_() {
 
         Customer original = new Customer();
@@ -27,13 +61,29 @@ class EntitiesTest {
         original.setName("Влад");
         original.setHaoticEnum(HaoticEnum.THREE);
 
+        Long[] array = new Long[3];
+        for (int x=0; x<3; x++ ) {
+            array[x] = (long)x*10;
+        }
+        original.setArray(array);
+
+        //List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
+        List<String> list = new ArrayList<>();
+            list.add("Alpha");
+            list.add("Beta");
+            list.add("Gamma");
+
+        original.setList(list);
+
         Customer copy = Entities.getCopyOf(original);
 
         assertEquals(original, copy);
         assertFalse(original == copy);
 
-        copy.setHaoticEnum(HaoticEnum.ONE);
+        assertTrue(Arrays.deepHashCode(original.getArray()) == Arrays.deepHashCode(copy.getArray()));
 
-        assertNotEquals(original, copy);
+
     }
+
+
 }

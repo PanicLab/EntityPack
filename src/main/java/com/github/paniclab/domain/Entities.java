@@ -5,6 +5,7 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Entities {
 
@@ -69,6 +70,8 @@ public final class Entities {
                 obj instanceof Byte ||
                 obj instanceof Boolean ||
                 obj instanceof Character ||
+                obj instanceof Float ||
+                obj instanceof Double ||
                 obj instanceof String ||
                 obj instanceof BigInteger ||
                 obj instanceof BigDecimal ||
@@ -81,27 +84,41 @@ public final class Entities {
             int arraySize = Array.getLength(obj);
             Class elementType = obj.getClass().getComponentType();
 
-            Object copy = Array.newInstance(elementType, arraySize);
+            T copy = (T)Array.newInstance(elementType, arraySize);
             for (int x = 0; x < arraySize; x++) {
-                Array.set(copy, x, getCopyOf(Array.get(obj, x)));
+                Array.set(copy, x, Array.get(obj, x));
             }
 
-            return (T)copy;
+            return copy;
         }
 
-        if (obj.getClass().isAssignableFrom(Collection.class)) {
+
+        if (Collection.class.isAssignableFrom(obj.getClass())) {
             Constructor<T> constructor;
-            constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
-                    .filter(c -> c.getGenericParameterTypes().length == 1)
-                    .filter(c -> c.getGenericParameterTypes()[0] == Collection.class)
-                    .findAny()
-                    .orElseThrow(() -> new Entity.InternalException("Unable to create copy of instance. " +
-                            System.lineSeparator() + "Instance: " + obj));
+            Object constructorArgument;
+
+            if(obj.getClass().getCanonicalName().equals("java.util.Arrays.ArrayList")) {
+                constructor = (Constructor<T>)Arrays.stream(obj.getClass().getDeclaredConstructors())
+                        .findAny()
+                        .orElseThrow(() -> new Entity.InternalException("Unable to create copy of instance. " +
+                                System.lineSeparator() + "Instance: " + obj));
+                constructorArgument = ((Collection)obj).toArray();
+
+            } else {
+                constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
+                        .filter(c -> c.getGenericParameterTypes().length == 1)
+                        .filter(c -> ((ParameterizedType) c.getGenericParameterTypes()[0]).getRawType().equals(Collection.class))
+                        .findAny()
+                        .orElseThrow(() -> new Entity.InternalException("Unable to create copy of instance. " +
+                                System.lineSeparator() + "Instance: " + obj));
+
+                constructorArgument = obj;
+            }
 
             T copy;
             constructor.setAccessible(true);
             try {
-                copy = constructor.newInstance(obj);
+                copy = constructor.newInstance(constructorArgument);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new Entity.InternalException("Unable to create copy of instance. " +
                         System.lineSeparator() + "Instance: " + obj);
@@ -110,7 +127,7 @@ public final class Entities {
             return copy;
         }
 
-        if (obj.getClass().isAssignableFrom(Map.class)) {
+        if (Map.class.isAssignableFrom(obj.getClass())) {
             Constructor<T> constructor;
             constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
                     .filter(c -> c.getGenericParameterTypes().length == 1)
@@ -154,7 +171,6 @@ public final class Entities {
 
         return copy;
     }
-
 
 
 

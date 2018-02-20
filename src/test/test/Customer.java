@@ -2,7 +2,7 @@ package test;
 
 import com.github.paniclab.domain.Entity;
 
-import java.util.Objects;
+import java.util.*;
 
 public class Customer  implements Entity<Long> {
 
@@ -10,6 +10,8 @@ public class Customer  implements Entity<Long> {
     private int age;
     private String name;
     private HaoticEnum haoticEnum;
+    private Long[] array;
+    private List<String> list = new ArrayList<>();
 
 
     @Override
@@ -40,7 +42,7 @@ public class Customer  implements Entity<Long> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, age, name);
+        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list);
     }
 
     public HaoticEnum getHaoticEnum() {
@@ -49,6 +51,22 @@ public class Customer  implements Entity<Long> {
 
     public void setHaoticEnum(HaoticEnum haoticEnum) {
         this.haoticEnum = haoticEnum;
+    }
+
+    public Long[] getArray() {
+        return array;
+    }
+
+    public void setArray(Long[] array) {
+        this.array = array;
+    }
+
+    public List<String> getList() {
+        return list;
+    }
+
+    public void setList(List<String> list) {
+        this.list = list;
     }
 
     @Override
@@ -64,6 +82,8 @@ public class Customer  implements Entity<Long> {
         if (this.getAge() != other.getAge()) return false;
         if (!(Objects.equals(this.getName(), other.getName()))) return false;
         if (!(Objects.equals(this.getHaoticEnum(), other.getHaoticEnum()))) return false;
+        if (!(Arrays.deepEquals(this.getArray(), other.getArray()))) return false;
+        if (!(this.list.equals(other.list))) return false;
 
         return true;
     }
