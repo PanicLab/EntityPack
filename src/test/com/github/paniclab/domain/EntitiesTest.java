@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import test.Customer;
 import test.HaoticEnum;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,11 +66,16 @@ class EntitiesTest {
 
         //List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
         List<String> list = new ArrayList<>();
-            list.add("Alpha");
-            list.add("Beta");
-            list.add("Gamma");
-
+        list.add("Alpha");
+        list.add("Beta");
+        list.add("Gamma");
         original.setList(list);
+
+        Set<Integer> set = new HashSet<>();
+        set.add(100);
+        set.add(200);
+        set.add(300);
+        original.setSet(set);
 
         Customer copy = Entities.getCopyOf(original);
 

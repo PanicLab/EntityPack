@@ -107,6 +107,7 @@ public final class Entities {
             } else {
                 constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
                         .filter(c -> c.getGenericParameterTypes().length == 1)
+                        .filter(c -> isNot(c.getGenericParameterTypes()[0].equals(int.class)))
                         .filter(c -> ((ParameterizedType) c.getGenericParameterTypes()[0]).getRawType().equals(Collection.class))
                         .findAny()
                         .orElseThrow(() -> new Entity.InternalException("Unable to create copy of instance. " +

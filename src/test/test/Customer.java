@@ -12,6 +12,7 @@ public class Customer  implements Entity<Long> {
     private HaoticEnum haoticEnum;
     private Long[] array;
     private List<String> list = new ArrayList<>();
+    private Set<Integer> set;
 
 
     @Override
@@ -40,11 +41,6 @@ public class Customer  implements Entity<Long> {
         this.name = name;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list);
-    }
-
     public HaoticEnum getHaoticEnum() {
         return haoticEnum;
     }
@@ -69,6 +65,19 @@ public class Customer  implements Entity<Long> {
         this.list = list;
     }
 
+    public Set<Integer> getSet() {
+        return set;
+    }
+
+    public void setSet(Set<Integer> set) {
+        this.set = set;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
@@ -83,7 +92,8 @@ public class Customer  implements Entity<Long> {
         if (!(Objects.equals(this.getName(), other.getName()))) return false;
         if (!(Objects.equals(this.getHaoticEnum(), other.getHaoticEnum()))) return false;
         if (!(Arrays.deepEquals(this.getArray(), other.getArray()))) return false;
-        if (!(this.list.equals(other.list))) return false;
+        if (!(Objects.equals(this.getList(), other.getList()))) return false;
+        if (!Objects.equals(this.getSet(), other.getSet())) return false;
 
         return true;
     }
