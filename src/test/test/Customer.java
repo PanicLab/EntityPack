@@ -12,7 +12,8 @@ public class Customer  implements Entity<Long> {
     private HaoticEnum haoticEnum;
     private Long[] array;
     private List<String> list = new ArrayList<>();
-    private Set<Integer> set;
+    private Set<String> set;
+    private Collection<String> arrayDeque = new ArrayDeque<>();
 
 
     @Override
@@ -65,24 +66,32 @@ public class Customer  implements Entity<Long> {
         this.list = list;
     }
 
-    public Set<Integer> getSet() {
+    public Set<String> getSet() {
         return set;
     }
 
-    public void setSet(Set<Integer> set) {
+    public void setSet(Set<String> set) {
         this.set = set;
+    }
+
+    public Collection<String> getArrayDeque() {
+        return arrayDeque;
+    }
+
+    public void setArrayDeque(Collection<String> arrayDeque) {
+        this.arrayDeque = arrayDeque;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set);
+        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set, arrayDeque);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (this == obj) return true;
-        if (this.hashCode() != obj.hashCode()) return false;
+        //if (this.hashCode() != obj.hashCode()) return false;
 
         if (!(this.getClass().equals(obj.getClass()))) return false;
         Customer other = Customer.class.cast(obj);

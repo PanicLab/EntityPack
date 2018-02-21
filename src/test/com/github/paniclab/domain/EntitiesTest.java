@@ -51,6 +51,112 @@ class EntitiesTest {
     }
 
     @Test
+    void getCopyOf_instanceWithEnumField() {
+        Customer original = new Customer();
+        original.setHaoticEnum(HaoticEnum.THREE);
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
+    void getCopyOf_instanceWithArrayField() {
+        Customer original = new Customer();
+
+        Long[] array = new Long[3];
+        for (int x=0; x<3; x++ ) {
+            array[x] = (long)x*10;
+        }
+        original.setArray(array);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
+    void getCopyOf_instanceWithConventionalList() {
+        Customer original = new Customer();
+
+        List<String> list = new ArrayList<>();
+        list.add("Alpha");
+        list.add("Beta");
+        list.add("Gamma");
+        original.setList(list);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
+    void getCopyOf_instanceWithArraysAsList() {
+        Customer original = new Customer();
+        List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
+        original.setList(list);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
+    void getCopyOf_instanceWithConventionalSet() {
+        Customer original = new Customer();
+
+        Set<String> set = new TreeSet<>();
+        set.add(String.valueOf(100));
+        set.add(String.valueOf(200));
+        set.add(String.valueOf(300));
+        original.setSet(set);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
+    void getCopyOf_instanceWithNonConventionalSet() {
+        Customer original = new Customer();
+
+        Map<String,Integer> map = new TreeMap<>();
+        map.put("ONE", 1);
+        map.put("TWO", 2);
+        map.put("THREE", 3);
+        Set<String> keys = map.keySet();
+
+        original.setSet(keys);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+
+    }
+
+    @Test
+    void getCopyOf_instanceWithArrayDequeCollection() {
+
+        Customer original = new Customer();
+
+        ArrayDeque<String> deque = new ArrayDeque<>();
+        deque.add("ONE");
+        deque.add("TWO");
+        deque.add("THREE");
+        original.setArrayDeque(deque);
+
+        Customer copy = Entities.getCopyOf(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
     void getCopyOf_() {
 
         Customer original = new Customer();
@@ -64,17 +170,19 @@ class EntitiesTest {
         }
         original.setArray(array);
 
-        List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
+        //List<String> list = Arrays.asList("Alpha", "Beta", "Gamma");
+        String[] emptyArray = new String[0];
+        List<String> list = Arrays.asList(emptyArray);
 /*        List<String> list = new ArrayList<>();
         list.add("Alpha");
         list.add("Beta");
         list.add("Gamma");*/
         original.setList(list);
 
-        Set<Integer> set = new TreeSet<>();
-        set.add(100);
-        set.add(200);
-        set.add(300);
+        Set<String> set = new TreeSet<>();
+        set.add(String.valueOf(100));
+        set.add(String.valueOf(200));
+        set.add(String.valueOf(300));
         original.setSet(set);
 
         Customer copy = Entities.getCopyOf(original);

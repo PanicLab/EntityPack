@@ -24,6 +24,7 @@ public interface Entity<T extends Serializable> {
         try {
             constructor.setAccessible(true);
             entity = constructor.newInstance();
+            //TODO сначала попробовать найти аннотированные поля @Id и т.д.
             Field idField = entity.getClass().getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(entity, id);
@@ -57,6 +58,10 @@ public interface Entity<T extends Serializable> {
 
     default boolean hasSameContentAs(Entity<T> another) {
         return Entities.hasSameContent(getThis(), another);
+    }
+
+    default boolean hasSameIdAs(Entity<T> another) {
+        return Entities.hasEqualsId(getThis(), another);
     }
 
     class InternalException extends RuntimeException {
