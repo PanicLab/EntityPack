@@ -35,7 +35,7 @@ public interface Entity<T extends Serializable> {
     }
 
     default boolean equalsById(Entity<T> another) {
-        return Entities.equalsById(getThis(), another);
+        return Entities.equalsByIds(getThis(), another);
     }
 
     class InternalException extends RuntimeException {

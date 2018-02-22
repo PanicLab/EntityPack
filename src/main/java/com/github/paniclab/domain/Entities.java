@@ -26,7 +26,7 @@ public final class Entities {
                     return false;
                 }
             } catch (IllegalAccessException e) {
-                throw new Entity.InternalException("Unable to compare two entities. Entity: " + one +
+                throw new Entity.InternalException("Unable to compare two entities by content. Entity: " + one +
                         System.lineSeparator() + "Another entity: " + another, e);
             }
         }
@@ -39,9 +39,11 @@ public final class Entities {
         boolean isObjectsMatched;
 
         try {
+
             isObjectsMatched = tryToMatchByContent(one, another);
+
         } catch (IllegalAccessException e) {
-            throw new Entity.InternalException("Unable to compare two instances." + System.lineSeparator() +
+            throw new Entity.InternalException("Unable to compare two instances by content." + System.lineSeparator() +
                     "Instance: " + one +
                     System.lineSeparator() + "Another instance: " + another, e);
         }
@@ -87,7 +89,7 @@ public final class Entities {
 
 
 
-    public static <ID extends Serializable, T extends Entity<ID>> boolean equalsById(T one, T another) {
+    public static <ID extends Serializable, T extends Entity<ID>> boolean equalsByIds(T one, T another) {
         return one.getId().equals(another.getId());
     }
 

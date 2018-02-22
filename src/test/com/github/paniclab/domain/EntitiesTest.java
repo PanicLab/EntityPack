@@ -1,6 +1,5 @@
 package com.github.paniclab.domain;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -244,7 +243,7 @@ class EntitiesTest {
         Customer otherDetached = Entity.getDetached(100L, Customer.class);
         assertNotNull(otherDetached);
 
-        assertTrue(Entities.equalsById(detached, otherDetached));
+        assertTrue(Entities.equalsByIds(detached, otherDetached));
     }
 
     @Test
