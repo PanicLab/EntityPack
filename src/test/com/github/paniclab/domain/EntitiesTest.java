@@ -163,6 +163,23 @@ class EntitiesTest {
     }
 
     @Test
+    void getCopy_instanceWithHashMap() {
+        Customer original = new Customer();
+
+        Map<String, Long> map = new HashMap<>();
+
+        map.put("ONE", 1L);
+        map.put("TWO", 2L);
+        map.put("THREE", 3L);
+        original.setMap(map);
+
+        Customer copy = Entities.getCopy(original);
+
+        assertEquals(original, copy);
+        assertFalse(original == copy);
+    }
+
+    @Test
     void getCopyOf_() {
 
         Customer original = new Customer();

@@ -14,6 +14,7 @@ public class Customer  implements Entity<Long> {
     private List<String> list = new ArrayList<>();
     private Set<String> set;
     private Collection<String> arrayDeque = new ArrayDeque<>();
+    private Map<String, Long> map;
 
 
     @Override
@@ -82,9 +83,17 @@ public class Customer  implements Entity<Long> {
         this.arrayDeque = arrayDeque;
     }
 
+    public Map getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Long> map) {
+        this.map = map;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set, arrayDeque);
+        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set, arrayDeque, map);
     }
 
     @Override
@@ -103,6 +112,7 @@ public class Customer  implements Entity<Long> {
         if (!(Arrays.deepEquals(this.getArray(), other.getArray()))) return false;
         if (!(Objects.equals(this.getList(), other.getList()))) return false;
         if (!Objects.equals(this.getSet(), other.getSet())) return false;
+        if (!Objects.equals(this.getMap(), other.getMap())) return false;
 
         return true;
     }

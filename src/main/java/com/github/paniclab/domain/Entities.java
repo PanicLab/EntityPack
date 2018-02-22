@@ -209,6 +209,10 @@ public final class Entities {
                     return SortOfObjectToCopy.IS_CONVENTIONAL_COLLECTION;
         }
 
+        if(     Map.class.isAssignableFrom(obj.getClass())) {
+                    return SortOfObjectToCopy.IS_CONVENTIONAL_MAP;
+        }
+
         return SortOfObjectToCopy.IS_POJO;
     }
 
@@ -278,9 +282,11 @@ public final class Entities {
 
     @SuppressWarnings("unchecked")
     private static <T> T copyConventionalMap(T obj) {
+        Constructor<T>[] constructors = (Constructor<T>[]) obj.getClass().getDeclaredConstructors();// для дебага, убрать
         Constructor<T> constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
                     .filter(c -> c.getGenericParameterTypes().length == 1)
-                    .filter(c -> c.getGenericParameterTypes()[0] == Map.class)
+                    .filter(c -> isNot(c.getGenericParameterTypes()[0].equals(int.class)))
+                    .filter(c -> ((ParameterizedType) c.getGenericParameterTypes()[0]).getRawType().equals(Map.class))
                     .findAny()
                     .orElseThrow(() -> new Entity.InternalException("Unable to create copy of instance. " +
                             System.lineSeparator() + "Instance: " + obj));
