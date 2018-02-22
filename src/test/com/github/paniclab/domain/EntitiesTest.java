@@ -21,6 +21,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -60,6 +61,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -76,6 +78,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -92,6 +95,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -104,6 +108,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -121,6 +126,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -141,6 +147,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
 
     }
@@ -159,6 +166,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -176,6 +184,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
     }
 
@@ -211,6 +220,7 @@ class EntitiesTest {
         Customer copy = Entities.getCopy(original);
 
         assertEquals(original, copy);
+        assertTrue(original.hashCode() == copy.hashCode());
         assertFalse(original == copy);
 
         assertTrue(Arrays.deepHashCode(original.getArray()) == Arrays.deepHashCode(copy.getArray()));
@@ -285,5 +295,6 @@ class EntitiesTest {
         another.setArrayDeque(arrayDeque2);
 
         assertTrue(Entities.equalsByContent(one,another));
+        assertTrue(one.hashCode() == another.hashCode());
     }
 }

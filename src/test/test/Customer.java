@@ -93,14 +93,22 @@ public class Customer  implements Entity<Long> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, age, name, haoticEnum, Arrays.deepHashCode(array), list, set, arrayDeque, map);
+        return Objects.hash(id,
+                            age,
+                            name,
+                            haoticEnum,
+                            Arrays.deepHashCode(array),
+                            list,
+                            set,
+                            Arrays.deepHashCode(arrayDeque.toArray()),
+                            map);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (this == obj) return true;
-        //if (this.hashCode() != obj.hashCode()) return false;
+        if (this.hashCode() != obj.hashCode()) return false;
 
         if (!(this.getClass().equals(obj.getClass()))) return false;
         Customer other = Customer.class.cast(obj);
@@ -111,7 +119,8 @@ public class Customer  implements Entity<Long> {
         if (!(Objects.equals(this.getHaoticEnum(), other.getHaoticEnum()))) return false;
         if (!(Arrays.deepEquals(this.getArray(), other.getArray()))) return false;
         if (!(Objects.equals(this.getList(), other.getList()))) return false;
-        if (!Objects.equals(this.getSet(), other.getSet())) return false;
+        if (!(Objects.equals(this.getSet(), other.getSet()))) return false;
+        if (!(Arrays.equals(this.getArrayDeque().toArray(), other.getArrayDeque().toArray()))) return false;
         if (!Objects.equals(this.getMap(), other.getMap())) return false;
 
         return true;
