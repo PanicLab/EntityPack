@@ -13,7 +13,7 @@ public final class Entities {
         throw new Entity.InternalException("This operation is not allowed.");
     }
 
-    public static <T extends Entity> boolean hasSameContentExceptId(T one, T another) {
+    public static <T extends Entity> boolean equalsByContentExceptId(T one, T another) {
         int numberOfFields = one.getEntityClass().getDeclaredFields().length;
         if (another.getEntityClass().getDeclaredFields().length != numberOfFields) return false;
 
@@ -35,20 +35,50 @@ public final class Entities {
     }
 
 
-    public static <T> boolean hasSameContent(T one, T another) {
+    public static <T> boolean equalsByContent(T one, T another) {
+        boolean isObjectsMatched;
+
+        try {
+            isObjectsMatched = tryToMatchByContent(one, another);
+        } catch (IllegalAccessException e) {
+            throw new Entity.InternalException("Unable to compare two instances." + System.lineSeparator() +
+                    "Instance: " + one +
+                    System.lineSeparator() + "Another instance: " + another, e);
+        }
+
+        return isObjectsMatched;
+    }
+
+    private static <T> boolean tryToMatchByContent(T one, T another) throws IllegalAccessException {
         int numberOfFields = one.getClass().getDeclaredFields().length;
         if (another.getClass().getDeclaredFields().length != numberOfFields) return false;
 
         Field[] fields = one.getClass().getDeclaredFields();
-        for (int x = 0; x < numberOfFields; x++  ) {
+        for (int x = 0; x < numberOfFields; x++) {
             Field current = fields[x];
-            try {
-                if (isNot(Objects.equals(current.get(one), current.get(another)))) {
+            current.setAccessible(true);
+            if (current.get(one) == null) {
+                if (current.get(another) != null) {
                     return false;
                 }
-            } catch (IllegalAccessException e) {
-                throw new Entity.InternalException("Unable to compare two instances. Instance: " + one +
-                        System.lineSeparator() + "Another instance: " + another, e);
+                continue;
+            }
+            if (current.getType().isArray()) {
+                if (isNot(Arrays.deepEquals((Object[]) current.get(one), (Object[]) current.get(another)))) {
+                    return false;
+                }
+                continue;
+            }
+            if (current.get(one).getClass().equals(ArrayDeque.class)) {
+                if (isNot(Arrays.deepEquals(
+                        ArrayDeque.class.cast(current.get(one)).toArray(),
+                        ArrayDeque.class.cast(current.get(another)).toArray()))) {
+                    return false;
+                }
+                continue;
+            }
+            if (isNot(Objects.equals(current.get(one), current.get(another)))) {
+                return false;
             }
         }
 
@@ -57,7 +87,7 @@ public final class Entities {
 
 
 
-    public static <ID extends Serializable, T extends Entity<ID>> boolean hasEqualsId(T one, T another) {
+    public static <ID extends Serializable, T extends Entity<ID>> boolean equalsById(T one, T another) {
         return one.getId().equals(another.getId());
     }
 
@@ -66,8 +96,55 @@ public final class Entities {
         return !statement;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <ID extends Serializable, T extends Entity<ID>> T createDetached(ID id, Class<T> clazz) {
+        if (id == null) throw new NullPointerException("Attempt to create detached instance with id = null.");
 
-    public static <T> T getCopyOf(T obj) {
+        Constructor<T> constructor;
+        constructor = (Constructor<T>) Arrays.stream(clazz.getDeclaredConstructors())
+                .filter(c -> c.getGenericParameterTypes().length == 0)
+                .findAny()
+                .orElseThrow(() -> new Entity.InternalException("Unable to create instance of class " +
+                        clazz.getCanonicalName() + ". This class has no appropriate " +
+                        "constructor with no args."));
+
+        T entity;
+        try {
+            constructor.setAccessible(true);
+            entity = constructor.newInstance();
+            //TODO сначала попробовать найти аннотированные поля @Id и т.д.
+            Field idField = entity.getClass().getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(entity, id);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |NoSuchFieldException e) {
+            throw new Entity.InternalException("Unable to create instance of class " + clazz.getCanonicalName(), e);
+        }
+
+        return entity;
+    }
+
+    private String getIdFieldName(Object obj) {
+        return findIdField(obj).map(Field::getName).orElse("");
+    }
+
+    private Optional<Field> findIdField(Object obj) {
+/*        for (Field field : obj.getClass().getDeclaredFields()) {
+            if(isId(field)) return Optional.of(field);
+        }
+        return Optional.empty();*/
+
+        return Arrays.stream(obj.getClass().getDeclaredFields())
+                    .filter(field -> isId(field))
+                    .findFirst();
+    }
+
+    //TODO проверить на наличие аннотаций
+    private boolean isId(Field field) {
+        return field.getName().equalsIgnoreCase("id");
+    }
+
+
+    public static <T> T getCopy(T obj) {
         if (obj == null) return null;
 
         SortOfObjectToCopy copyCase = detectCopyCase(obj);
@@ -95,7 +172,7 @@ public final class Entities {
     }
 
     private static <T> SortOfObjectToCopy detectCopyCase(T obj) {
-        if (    obj instanceof Long ||
+        if(     obj instanceof Long ||
                 obj instanceof Integer ||
                 obj instanceof Short ||
                 obj instanceof Byte ||
@@ -104,32 +181,32 @@ public final class Entities {
                 obj instanceof Float ||
                 obj instanceof Double
                 ) {
-                        return SortOfObjectToCopy.IS_PRIMITIVE_WRAPPER;
+                    return SortOfObjectToCopy.IS_PRIMITIVE_WRAPPER;
         }
 
         if(     obj instanceof String) {
-                        return SortOfObjectToCopy.IS_STRING;
+                    return SortOfObjectToCopy.IS_STRING;
         }
 
         if(     obj instanceof BigInteger ||
                 obj instanceof BigDecimal) {
-                        return SortOfObjectToCopy.IS_BIG_NUMBER;
+                    return SortOfObjectToCopy.IS_BIG_NUMBER;
         }
 
         if(     obj instanceof Enum) {
-                        return SortOfObjectToCopy.IS_ENUM;
+                    return SortOfObjectToCopy.IS_ENUM;
         }
 
         if(     obj.getClass().isArray()) {
-                        return SortOfObjectToCopy.IS_ARRAY;
+                    return SortOfObjectToCopy.IS_ARRAY;
         }
 
         if(     obj.getClass().getCanonicalName().equals("java.util.Arrays.ArrayList")) {
-                        return SortOfObjectToCopy.IS_ARRAY_AS_LIST;
+                    return SortOfObjectToCopy.IS_ARRAY_AS_LIST;
         }
 
         if(     Collection.class.isAssignableFrom(obj.getClass())) {
-                        return SortOfObjectToCopy.IS_CONVENTIONAL_COLLECTION;
+                    return SortOfObjectToCopy.IS_CONVENTIONAL_COLLECTION;
         }
 
         return SortOfObjectToCopy.IS_POJO;
@@ -178,7 +255,7 @@ public final class Entities {
 
     @SuppressWarnings("unchecked")
     private static <T> T copyConventionalCollection(T obj) {
-        Constructor<T>[] constructors = (Constructor<T>[]) obj.getClass().getDeclaredConstructors();
+        Constructor<T>[] constructors = (Constructor<T>[]) obj.getClass().getDeclaredConstructors();// для дебага, убрать
         Constructor<T> constructor = (Constructor<T>) Arrays.stream(obj.getClass().getDeclaredConstructors())
                 .filter(c -> c.getGenericParameterTypes().length == 1)
                 .filter(c -> isNot(c.getGenericParameterTypes()[0].equals(int.class)))
@@ -237,7 +314,7 @@ public final class Entities {
             Field[] fields = obj.getClass().getDeclaredFields();
             for (Field f : fields) {
                 f.setAccessible(true);
-                f.set(copy, getCopyOf(f.get(obj)));
+                f.set(copy, getCopy(f.get(obj)));
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new Entity.InternalException("Unable to create copy of instance. " + System.lineSeparator() +
@@ -261,7 +338,7 @@ public final class Entities {
     }
 
     enum CopyMode {
-        ARBITRARY,
+        MEDIATE,
         DEEP,
     }
 }

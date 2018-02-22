@@ -1,40 +1,14 @@
 package com.github.paniclab.domain;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+
 
 public interface Entity<T extends Serializable> {
 
     @SuppressWarnings("unchecked")
-    static <ID extends Serializable, TYPE extends Entity<ID>> TYPE getDetached(ID id, Class<TYPE> clazz) {
-        if (id == null) throw new NullPointerException("Attempt to create detached instance with id = null.");
-
-        Constructor<TYPE> constructor;
-        constructor = (Constructor<TYPE>) Arrays.stream(clazz.getDeclaredConstructors())
-                .filter(c -> c.getGenericParameterTypes().length == 0)
-                .findAny()
-                .orElseThrow(() -> new InternalException("Unable to create instance of class " +
-                        clazz.getCanonicalName() + ". This class has no appropriate " +
-                        "constructor with no args."));
-
-        TYPE entity;
-        try {
-            constructor.setAccessible(true);
-            entity = constructor.newInstance();
-            //TODO сначала попробовать найти аннотированные поля @Id и т.д.
-            Field idField = entity.getClass().getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(entity, id);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |NoSuchFieldException e) {
-            throw new InternalException("Unable to create instance of class " + clazz.getCanonicalName(), e);
-        }
-
-        return entity;
+    static <ID extends Serializable, T extends Entity<ID>> T getDetached(ID id, Class<T> clazz) {
+        return Entities.createDetached(id, clazz);
     }
-
 
     T getId();
 
@@ -52,16 +26,16 @@ public interface Entity<T extends Serializable> {
         return getThis().getClass();
     }
 
-    default boolean hasSameContentExceptIdAs(Entity<T> another) {
-        return Entities.hasSameContentExceptId(getThis(), another);
+    default boolean equalsByContenExceptId(Entity<T> another) {
+        return Entities.equalsByContentExceptId(getThis(), another);
     }
 
-    default boolean hasSameContentAs(Entity<T> another) {
-        return Entities.hasSameContent(getThis(), another);
+    default boolean equalsByContent(Entity<T> another) {
+        return Entities.equalsByContent(getThis(), another);
     }
 
-    default boolean hasSameIdAs(Entity<T> another) {
-        return Entities.hasEqualsId(getThis(), another);
+    default boolean equalsById(Entity<T> another) {
+        return Entities.equalsById(getThis(), another);
     }
 
     class InternalException extends RuntimeException {
