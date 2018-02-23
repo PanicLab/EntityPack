@@ -125,23 +125,23 @@ public final class Entities {
         return entity;
     }
 
-    private String getIdFieldName(Object obj) {
+    private static String getIdFieldName(Object obj) {
         return findIdField(obj).map(Field::getName).orElse("");
     }
 
-    private Optional<Field> findIdField(Object obj) {
+    private static Optional<Field> findIdField(Object obj) {
 /*        for (Field field : obj.getClass().getDeclaredFields()) {
             if(isId(field)) return Optional.of(field);
         }
         return Optional.empty();*/
 
         return Arrays.stream(obj.getClass().getDeclaredFields())
-                    .filter(field -> isId(field))
+                    .filter(Entities::isId)
                     .findFirst();
     }
 
     //TODO проверить на наличие аннотаций
-    private boolean isId(Field field) {
+    private static boolean isId(Field field) {
         return field.getName().equalsIgnoreCase("id");
     }
 
