@@ -13,34 +13,12 @@ public final class Entities {
         throw new Entity.InternalException("This operation is not allowed.");
     }
 
-    public static <T extends Entity> boolean equalsByContentExceptId(T one, T another) {
-        int numberOfFields = one.getEntityClass().getDeclaredFields().length;
-        if (another.getEntityClass().getDeclaredFields().length != numberOfFields) return false;
-
-        Field[] fields = one.getEntityClass().getDeclaredFields();
-        for (int x = 0; x < numberOfFields; x++  ) {
-            Field current = fields[x];
-            if (current.getName().equals("id")) continue;
-            try {
-                if (isNot(Objects.equals(current.get(one), current.get(another)))) {
-                    return false;
-                }
-            } catch (IllegalAccessException e) {
-                throw new Entity.InternalException("Unable to compare two entities by content. Entity: " + one +
-                        System.lineSeparator() + "Another entity: " + another, e);
-            }
-        }
-
-        return true;
-    }
-
-
-    public static <T> boolean equalsByContent(T one, T another) {
-        boolean isObjectsMatched;
+    public static <ID extends Serializable, T extends Entity<ID>> boolean equalsByContentExceptId(T one, T another) {
+        boolean isContentExceptIdsMatched;
 
         try {
 
-            isObjectsMatched = tryToMatchByContent(one, another);
+            isContentExceptIdsMatched = tryToMatchByContentExceptIds(one, another);
 
         } catch (IllegalAccessException e) {
             throw new Entity.InternalException("Unable to compare two instances by content." + System.lineSeparator() +
@@ -48,38 +26,42 @@ public final class Entities {
                     System.lineSeparator() + "Another instance: " + another, e);
         }
 
-        return isObjectsMatched;
+        return isContentExceptIdsMatched;
     }
 
-    private static <T> boolean tryToMatchByContent(T one, T another) throws IllegalAccessException {
+    private static <T> boolean tryToMatchByContentExceptIds(T one, T another) throws IllegalAccessException {
         int numberOfFields = one.getClass().getDeclaredFields().length;
-        if (another.getClass().getDeclaredFields().length != numberOfFields) return false;
+        //if (another.getClass().getDeclaredFields().length != numberOfFields) return false;
 
         Field[] fields = one.getClass().getDeclaredFields();
         for (int x = 0; x < numberOfFields; x++) {
-            Field current = fields[x];
-            current.setAccessible(true);
-            if (current.get(one) == null) {
-                if (current.get(another) != null) {
+            Field currentField = fields[x];
+            currentField.setAccessible(true);
+
+            if (isId(currentField)) {
+                continue;
+            }
+            if (currentField.get(one) == null) {
+                if (currentField.get(another) != null) {
                     return false;
                 }
                 continue;
             }
-            if (current.getType().isArray()) {
-                if (isNot(Arrays.deepEquals((Object[]) current.get(one), (Object[]) current.get(another)))) {
+            if (currentField.getType().isArray()) {
+                if (isNot(Arrays.deepEquals((Object[]) currentField.get(one), (Object[]) currentField.get(another)))) {
                     return false;
                 }
                 continue;
             }
-            if (current.get(one).getClass().equals(ArrayDeque.class)) {
+            if (currentField.get(one).getClass().equals(ArrayDeque.class)) {
                 if (isNot(Arrays.deepEquals(
-                        ArrayDeque.class.cast(current.get(one)).toArray(),
-                        ArrayDeque.class.cast(current.get(another)).toArray()))) {
+                        ArrayDeque.class.cast(currentField.get(one)).toArray(),
+                        ArrayDeque.class.cast(currentField.get(another)).toArray()))) {
                     return false;
                 }
                 continue;
             }
-            if (isNot(Objects.equals(current.get(one), current.get(another)))) {
+            if (isNot(Objects.equals(currentField.get(one), currentField.get(another)))) {
                 return false;
             }
         }
@@ -87,6 +69,37 @@ public final class Entities {
         return true;
     }
 
+    //TODO проверить на наличие аннотаций
+    private static boolean isId(Field field) {
+        return field.getName().equalsIgnoreCase("id");
+    }
+
+    private static Optional<Field> findIdField(Object obj) {
+        return Arrays.stream(obj.getClass().getDeclaredFields())
+                .filter(Entities::isId)
+                .findFirst();
+    }
+
+    private static String getIdFieldName(Object obj) {
+        return findIdField(obj).map(Field::getName).orElse("");
+    }
+
+
+    public static <ID extends Serializable, T extends Entity<ID>> boolean equalsByContent(T one, T another) {
+        boolean isContentExceptIdsMatched;
+
+        try {
+
+            isContentExceptIdsMatched = tryToMatchByContentExceptIds(one, another);
+
+        } catch (IllegalAccessException e) {
+            throw new Entity.InternalException("Unable to compare two instances by content." + System.lineSeparator() +
+                    "Instance: " + one +
+                    System.lineSeparator() + "Another instance: " + another, e);
+        }
+
+        return isContentExceptIdsMatched && equalsByIds(one, another);
+    }
 
 
     public static <ID extends Serializable, T extends Entity<ID>> boolean equalsByIds(T one, T another) {
@@ -123,26 +136,6 @@ public final class Entities {
         }
 
         return entity;
-    }
-
-    private static String getIdFieldName(Object obj) {
-        return findIdField(obj).map(Field::getName).orElse("");
-    }
-
-    private static Optional<Field> findIdField(Object obj) {
-/*        for (Field field : obj.getClass().getDeclaredFields()) {
-            if(isId(field)) return Optional.of(field);
-        }
-        return Optional.empty();*/
-
-        return Arrays.stream(obj.getClass().getDeclaredFields())
-                    .filter(Entities::isId)
-                    .findFirst();
-    }
-
-    //TODO проверить на наличие аннотаций
-    private static boolean isId(Field field) {
-        return field.getName().equalsIgnoreCase("id");
     }
 
 
