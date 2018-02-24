@@ -1,4 +1,4 @@
-package com.github.paniclab.domain;
+package com.github.paniclab.entitypack;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package com.github.paniclab.domain;
+package com.github.paniclab.entitypack;
 
 interface Essential {
     Object getThis();

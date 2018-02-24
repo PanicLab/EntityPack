@@ -1,4 +1,4 @@
-package com.github.paniclab.domain;
+package com.github.paniclab.entitypack;
 
 import org.junit.jupiter.api.Test;
 import test.Customer;

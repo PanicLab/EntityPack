@@ -1,10 +1,8 @@
-package com.github.paniclab.domain;
+package com.github.paniclab.entitypack;
 
 
 import java.io.Serializable;
 import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 public final class Entities {

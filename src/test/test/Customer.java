@@ -1,6 +1,6 @@
 package test;
 
-import com.github.paniclab.domain.Entity;
+import com.github.paniclab.entitypack.Entity;
 
 import java.util.*;
 
