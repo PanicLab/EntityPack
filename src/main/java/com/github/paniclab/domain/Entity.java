@@ -3,7 +3,7 @@ package com.github.paniclab.domain;
 import java.io.Serializable;
 
 
-public interface Entity<T extends Serializable> {
+public interface Entity<T extends Serializable> extends Essential {
 
     @SuppressWarnings("unchecked")
     static <ID extends Serializable, T extends Entity<ID>> T getDetached(ID id, Class<T> clazz) {
@@ -12,6 +12,7 @@ public interface Entity<T extends Serializable> {
 
     T getId();
 
+    @Override
     Entity<T> getThis();
 
     default boolean isTransient() {
