@@ -1,14 +1,19 @@
-package com.github.paniclab.entitypack;
+package com.github.paniclab.entitypack_old;
 
 import java.io.Serializable;
 
-public interface Entity<ID extends Serializable> extends Instantiable {
-    @Override
-    default Entity<ID> getThis() {
-        return this;
+
+public interface Entity<T extends Serializable> extends Essential {
+
+    @SuppressWarnings("unchecked")
+    static <ID extends Serializable, T extends Entity<ID>> T getDetached(ID id, Class<T> clazz) {
+        return Entities.createDetached(id, clazz);
     }
 
-    ID getId();
+    T getId();
+
+    @Override
+    Entity<T> getThis();
 
     default boolean isTransient() {
         return !isAlreadyPersisted();
@@ -22,7 +27,17 @@ public interface Entity<ID extends Serializable> extends Instantiable {
         return getThis().getClass();
     }
 
+    default boolean equalsByContenExceptId(Entity<T> another) {
+        return Entities.equalsByContentExceptId(getThis(), another);
+    }
 
+    default boolean equalsByContent(Entity<T> another) {
+        return Entities.equalsByContent(getThis(), another);
+    }
+
+    default boolean equalsById(Entity<T> another) {
+        return Entities.equalsByIds(getThis(), another);
+    }
 
     class InternalException extends RuntimeException {
         public InternalException() {

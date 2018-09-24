@@ -1,10 +1,11 @@
 package test;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.github.paniclab.entitypack.Entity;
 
 import java.util.*;
 
-public class Customer  implements Entity<Long> {
+public class Customer implements Entity<Long> {
 
     private Long id;
     private int age;
@@ -124,5 +125,10 @@ public class Customer  implements Entity<Long> {
         if (!Objects.equals(this.getMap(), other.getMap())) return false;
 
         return true;
+    }
+
+    public Customer copy() {
+        Kryo kryo = new Kryo();
+        return kryo.copy(this);
     }
 }
