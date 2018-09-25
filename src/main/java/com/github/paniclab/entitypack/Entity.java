@@ -18,10 +18,6 @@ public interface Entity<ID extends Serializable> extends Instantiable {
         return getId() != null;
     }
 
-    default Class<? extends Entity> getEntityClass() {
-        return getThis().getClass();
-    }
-
 
 
     class InternalException extends RuntimeException {

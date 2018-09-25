@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/inspectionProfiles/
+.idea/libraries/Maven__org_springframework_spring_core_5_0_4_RELEASE.xml
+.idea/libraries/Maven__org_springframework_spring_jcl_5_0_4_RELEASE.xml
+.idea/libraries/Maven__org_springframework_spring_test_5_0_4_RELEASE.xml
+.idea/workspace.xml
+desktop.ini
+target/
+
