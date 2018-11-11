@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 public interface Content<T> {
     static <U> Content<U> valueOf(U attachment) {
-        return new DefaultContentImpl<>(attachment);
+        return new DefaultContentWrapper<>(attachment);
     }
 
     static <U, R> R from(Content<U> content, Function<? super U, ? extends R> converter) {

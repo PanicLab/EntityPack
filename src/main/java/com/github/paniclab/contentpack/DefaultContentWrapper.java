@@ -1,9 +1,9 @@
 package com.github.paniclab.contentpack;
 
-class DefaultContentImpl<T> implements Content<T>{
+class DefaultContentWrapper<T> implements Content<T>{
     private T value;
 
-    DefaultContentImpl(T value) {
+    DefaultContentWrapper(T value) {
         this.value = value;
     }
 
