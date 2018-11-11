@@ -2,6 +2,12 @@ package com.github.paniclab.contentpack;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.Channel;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 
 public class BinaryData implements Convertible {
@@ -15,7 +21,7 @@ public class BinaryData implements Convertible {
         try {
             this.buffer = ByteBuffer.wrap(toBytes(inputStream));
         } catch (IOException e) {
-            throw new RuntimeException("Cannot read data from InputStream.", e);
+            throw new RuntimeException("Cannot read data from InputStream. InputStream: " + inputStream, e);
         }
     }
 
@@ -46,18 +52,14 @@ public class BinaryData implements Convertible {
 
     BinaryData(OutputStream outputStream) {
         try {
-            PipedOutputStream pipedOutputStream = new PipedOutputStream(outputStream);
-            PipedInputStream pipedInputStream = new PipedInputStream(outputStream);
-            this.buffer = ByteBuffer.wrap(toBytes(pipedInputStream));
+            File file = File.createTempFile("bdt", null);
+
+            FileChannel channel = new FileOutputStream(file).getChannel();
+            MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0L, channel.size());
+            this.buffer = buffer.load();
+            file.delete();
         } catch (IOException e) {
-            throw new RuntimeException("Cannot read data from InputStream.", e);
+            throw new RuntimeException("Cannot read data from OutputStream. OutputStream: " + outputStream, e);
         }
-    }
-
-    private byte[] toBytes(OutputStream outputStream) {
-        int count = 0;
-        byte[] bytes = new byte[64];
-
-        outputStream
     }
 }
