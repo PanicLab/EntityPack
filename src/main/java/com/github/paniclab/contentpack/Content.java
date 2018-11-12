@@ -1,5 +1,6 @@
 package com.github.paniclab.contentpack;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface Content<T> {
@@ -28,5 +29,13 @@ public interface Content<T> {
         }
         throw new IllegalArgumentException("Instance of " + this.getClass().getCanonicalName() +
                 " can not be converted to " + clazz.getCanonicalName());
+    }
+
+    default void consume(Consumer<? super T> consumer) {
+        consumer.accept(value());
+    }
+
+    default <R> Content<R> map(Function<? super T, ? extends R> function) {
+        return Content.valueOf(function.apply(value()));
     }
 }
